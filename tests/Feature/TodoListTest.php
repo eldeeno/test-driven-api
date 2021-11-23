@@ -15,7 +15,7 @@ class TodoListTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->list = TodoList::factory()->create();
+        $this->list = $this->createTodoList();
     }
 
     /**
@@ -49,6 +49,30 @@ class TodoListTest extends TestCase
         $this->withExceptionHandling();
 
         $this->postJson(route('todo-list.store'))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrorFor('name')
+            ->assertJsonValidationErrors(['name']);
+    }
+
+    public function test_delete_todo_list()
+    {
+        $this->deleteJson(route('todo-list.destroy', $this->list->id))
+            ->assertNoContent();
+        $this->assertDatabaseMissing('todo_lists', ['name' => $this->list->name]);
+    }
+
+    public function test_update_todo_list()
+    {
+        $this->patchJson(route('todo-list.update', $this->list->id), ['name' => 'updated name'])
+            ->assertOk();
+        $this->assertDatabaseHas('todo_lists', ['id' => $this->list->id, 'name' => 'updated name']);
+    }
+
+    public function test_name_field_is_required_before_updating_todo_list()
+    {
+        $this->withExceptionHandling();
+
+        $this->patchJson(route('todo-list.update', $this->list->id))
             ->assertUnprocessable()
             ->assertJsonValidationErrorFor('name')
             ->assertJsonValidationErrors(['name']);

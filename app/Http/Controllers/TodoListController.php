@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TodoListRequest;
 use App\Models\TodoList;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,12 +23,11 @@ class TodoListController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param TodoListRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(TodoListRequest $request)
     {
-        $request->validate(['name' => ['required']]);
         return TodoList::create($request->all());
     }
 
@@ -45,13 +45,14 @@ class TodoListController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param TodoListRequest $request
+     * @param TodoList $todoList
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(TodoListRequest $request, TodoList $todoList)
     {
-        //
+        $todoList->update($request->all());
+        return response($todoList);
     }
 
     /**
@@ -60,8 +61,9 @@ class TodoListController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(TodoList $todoList)
     {
-        //
+        $todoList->delete();
+        return response('',Response::HTTP_NO_CONTENT);
     }
 }
