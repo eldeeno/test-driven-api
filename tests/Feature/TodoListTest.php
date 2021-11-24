@@ -18,9 +18,6 @@ class TodoListTest extends TestCase
         $this->list = $this->createTodoList();
     }
 
-    /**
-     * Test fetch all todo-lists.
-     */
     public function test_fetch_all_todo_list()
     {
         $response = $this->getJson(route('todo-list.index'));
